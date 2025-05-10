@@ -1,4 +1,6 @@
 # Project Description
+Team: Joshua Williams, Amrith Gandham, Rohan Simha, Vaibava Venkatesan
+
 ## Who is our target audience?
 Our application is designed for fans of professional sports and enjoy the challenge of assembling and managing their own team of sports players. We want to create an application where individuals can roleplay as a sports manager, and have a chance to win a championship on their own. These users can range from dedicated players who follow statistics and matches closely  to casual fans who want to compete with friends and family. Ultimately, we hope to create a community where different sports fans can engage with each other to share their love for sports. We hope to deepen their engagement with sports and organize a platform where memories can be created.
 
