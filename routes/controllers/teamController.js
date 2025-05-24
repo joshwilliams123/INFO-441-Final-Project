@@ -71,7 +71,3 @@ export async function dropPlayer ( req, res, next) {
         res.status(401).json({ status: "error", message: "not logged in" });
     }
 }; 
-
-
-
-export default TeamController;

@@ -1,10 +1,13 @@
 import express from 'express';
+import sessions from 'express-session';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
 import usersRouter from './routes/users.js';
 import teamRoutes from './routes/team.js';
+
+import WebAppAuthProvider from 'msal-node-wrapper'
 
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -43,15 +46,12 @@ app.enable('trust proxy')
 const oneDay = 1000 * 60 * 60 * 24;  
 
 app.use(sessions({
-    secret: process.env.SECRET,
-    cookie: { 
-        maxAge: oneDay,
-        secure: true,
-        sameSite: 'none'
-    },
+    secret: "mysecret",
+    cookie: {maxAge: oneDay},
     resave: false,
     saveUninitialized: true,
 }))
+
 const authProvider = await WebAppAuthProvider.WebAppAuthProvider.initialize(authConfig);
 app.use(authProvider.authenticate());
 
