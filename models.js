@@ -4,7 +4,7 @@ let models = {}
 
 console.log("connecting to mongodb")
 
-await mongoose.connect("mongodb+srv://vaibav:123456abc@info-441.nfo2ghy.mongodb.net/?retryWrites=true&w=majority&appName=INFO-441")
+await mongoose.connect("mongodb+srv://jaw67:12345@info441.ex3faqo.mongodb.net/final?retryWrites=true&w=majority&appName=INFO441")
 
 
 const teamSchema = new mongoose.Schema({

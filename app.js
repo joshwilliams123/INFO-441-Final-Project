@@ -4,8 +4,8 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
-import usersRouter from './routes/users.js';
-import teamRoutes from './routes/team.js';
+import usersRouter from './api/users.js';
+import teamRoutes from './api/team.js';
 
 import WebAppAuthProvider from 'msal-node-wrapper'
 
@@ -20,20 +20,20 @@ var app = express();
 //TODO: ADD AUTHENTICATION
 const authConfig = {
     auth: {
-   clientId: "62e6fe3d-2690-4bc8-95c9-fa0bb375b106",
-    authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
-    clientSecret: "vc98Q~NztQdevW1pekVv2jbehjrK62yqwsIZjbD5",
-    redirectUri: "https://a7-websharer.vaibavproject.me/redirect",
+        clientId: "9c6b9dfa-e30d-4cc7-a7fe-168dfc3903ec",
+        authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
+        clientSecret: "~da8Q~oPPNDK22dQaijoJkCDPiRw-F6mlPR7-b_Y",
+        redirectUri: "https://info-441-final-project.onrender.com/redirect",
     },
-system: {
-    loggerOptions: {
-        loggerCallback(loglevel, message, containsPii) {
-            console.log(message);
-        },
-        piiLoggingEnabled: false,
-        logLevel: 3,
+    system: {
+        loggerOptions: {
+            loggerCallback(loglevel, message, containsPii) {
+                console.log(message);
+            },
+            piiLoggingEnabled: false,
+            logLevel: 3,
+        }
     }
-}
 };
 
 app.use(logger('dev'));
@@ -43,11 +43,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.enable('trust proxy')
-const oneDay = 1000 * 60 * 60 * 24;  
+const oneDay = 1000 * 60 * 60 * 24;
 
 app.use(sessions({
     secret: "mysecret",
-    cookie: {maxAge: oneDay},
+    cookie: { maxAge: oneDay },
     resave: false,
     saveUninitialized: true,
 }))
@@ -55,7 +55,20 @@ app.use(sessions({
 const authProvider = await WebAppAuthProvider.WebAppAuthProvider.initialize(authConfig);
 app.use(authProvider.authenticate());
 
-app.use('/users', usersRouter);
+app.get('/signin', (req, res, next) => {
+    return req.authContext.login({
+        postLoginRedirectUri: "/", 
+    })(req, res, next);
+
+});
+app.get('/signout', (req, res, next) => {
+    return req.authContext.logout({
+        postLogoutRedirectUri: "/", 
+    })(req, res, next);
+
+});
+
+app.use('/api/users', usersRouter);
 app.use('/api/team', teamRoutes);
 
 export default app;
