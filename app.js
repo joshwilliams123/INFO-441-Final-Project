@@ -7,6 +7,8 @@ import logger from 'morgan';
 import usersRouter from './api/users.js';
 import teamRoutes from './api/team.js';
 
+import models from './models.js';
+
 import WebAppAuthProvider from 'msal-node-wrapper'
 
 import { fileURLToPath } from 'url';
@@ -66,6 +68,11 @@ app.get('/signout', (req, res, next) => {
         postLogoutRedirectUri: "/", 
     })(req, res, next);
 
+});
+
+app.use((req, res, next) => {
+    req.models = models;
+    next();
 });
 
 app.use('/api/users', usersRouter);

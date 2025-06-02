@@ -8,16 +8,17 @@ router.get('/', async function(req, res, next) {
 
 export async function createTeam ( req, res, next) { 
     if (req.session.isAuthenticated) {
-        const { teamName } = req.body;
+        const { teamName, members } = req.body;
         try {
-            const teamData = await req.models.Team.exists({ teamName }); 
+            const teamData = await req.models.Post.exists({ teamName }); 
             if (!teamData) {
-                const newTeamData = new req.models.Team({
+                const newTeamData = new req.models.Post({
                     teamName,
+                    members,
                     created_date: Date.now() 
                 });
                 await newTeamData.save();
-                res.json({ status: "success", message: "team created" });
+                res.json({ status: "success", message: "team created", team: newTeamData });
             } else {
                 res.json ({status: "error", message: "team already exists" });
             }
