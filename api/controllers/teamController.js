@@ -1,6 +1,5 @@
 import express from 'express';
 var router = express.Router();
-import sessions from 'express-session';
 
 router.get('/', async function(req, res, next) {
   
