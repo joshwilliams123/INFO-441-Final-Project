@@ -25,7 +25,7 @@ const authConfig = {
         clientId: "9c6b9dfa-e30d-4cc7-a7fe-168dfc3903ec",
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
         clientSecret: "~da8Q~oPPNDK22dQaijoJkCDPiRw-F6mlPR7-b_Y",
-        redirectUri: "/redirect",
+        redirectUri: "https://info-441-final-project.onrender.com/redirect",
     },
     system: {
         loggerOptions: {
