@@ -24,7 +24,7 @@ const authConfig = {
         clientId: "9c6b9dfa-e30d-4cc7-a7fe-168dfc3903ec",
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
         clientSecret: "~da8Q~oPPNDK22dQaijoJkCDPiRw-F6mlPR7-b_Y",
-        redirectUri: "https://info-441-final-project.onrender.com/redirect",
+        redirectUri: "/redirect",
     },
     system: {
         loggerOptions: {
@@ -41,7 +41,12 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public', 'league.html')));
+
+app.use((req, res, next) => {
+    req.models = models;
+    next();
+});
 
 app.enable('trust proxy')
 const oneDay = 1000 * 60 * 60 * 24;
@@ -56,6 +61,9 @@ app.use(sessions({
 const authProvider = await WebAppAuthProvider.WebAppAuthProvider.initialize(authConfig);
 app.use(authProvider.authenticate());
 
+
+app.use('/api', apiRouter);
+
 app.get('/signin', (req, res, next) => {
     return req.authContext.login({
         postLoginRedirectUri: "/", 
@@ -69,11 +77,6 @@ app.get('/signout', (req, res, next) => {
 
 });
 
-app.use((req, res, next) => {
-    req.models = models;
-    next();
-});
-
-app.use('/api', apiRouter);
+app.use(authProvider.interactionErrorHandler());
 
 export default app;
