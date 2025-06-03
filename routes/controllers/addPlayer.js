@@ -24,4 +24,24 @@ router.post("/", async (req, res) => {
   }
 });
 
+//Get the players from the team based on the current user logged in
+router.get("/", async (req, res) => {
+  if (req.session.isAuthenticated) {
+    const { teamName } = req.query;
+    try {
+      const team = await req.models.Post.findOne({ teamName });
+      if (team) {
+        res.status(200).json({ status: "success", team });
+      } else {
+        res.json({ status: "error", message: "team does not exist" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ status: "error", message: error.message });
+    }
+  } else {
+    res.status(401).json({ status: "error", message: "not logged in" });
+  }
+});
+
 export default router;

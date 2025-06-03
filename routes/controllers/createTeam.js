@@ -1,4 +1,7 @@
 import express from "express";
+import fs from "fs";
+import path from "path";
+import { parse } from "csv-parse";
 var router = express.Router();
 
 router.post("/create", async (req, res, next) => {
@@ -28,6 +31,25 @@ router.post("/create", async (req, res, next) => {
   } else {
     res.status(401).json({ status: "error", message: "not logged in" });
   }
+});
+
+router.get("/player-names", async (req, res) => {
+  const csvPath = path.join(process.cwd(), "data", "players.csv");
+  const playerNames = [];
+  fs.createReadStream(csvPath)
+    .pipe(parse({ columns: true }))
+    .on("data", (row) => {
+      if (row.Player && !playerNames.includes(row.Player)) {
+        playerNames.push(row.Player.trim());
+      }
+    })
+    .on("end", () => {
+      res.json(playerNames);
+    })
+    .on("error", (err) => {
+      console.error(err);
+      res.status(500).json({ error: "Failed to read player names" });
+    });
 });
 
 export default router;

@@ -2,7 +2,8 @@ function initCreateTeam() {
     document.getElementById('create-team-form').onsubmit = async function (e) {
         e.preventDefault();
         const teamName = document.getElementById('teamName').value.trim();
-        const members = document.getElementById('members').value.split(',').map(m => m.trim()).filter(Boolean);
+        const membersSelect = document.getElementById('members');
+        const members = Array.from(membersSelect.selectedOptions).map(opt => opt.value);
 
         const res = await fetch('/api/team/create', {
             method: 'POST',
