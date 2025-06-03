@@ -5,7 +5,7 @@ import { parse } from 'csv-parse/sync';
 
 const router = express.Router();
 
-router.get('/api/leaderboard', (req, res) => {
+router.get('/', (req, res) => {
   const csvPath = path.join(process.cwd(), 'data', 'players.csv');
   const csvData = fs.readFileSync(csvPath, 'utf8');
   const records = parse(csvData, { columns: true, skip_empty_lines: true });
