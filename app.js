@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
 import apiRouter from './routes/api.js';
+import leaderboardRouter from './routes/controllers/leaderboard.js';
 
 import models from './models.js';
 
@@ -75,5 +76,6 @@ app.use((req, res, next) => {
 });
 
 app.use('/api', apiRouter);
+app.use(leaderboardRouter);
 
 export default app;

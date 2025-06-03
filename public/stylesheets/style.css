@@ -16,6 +16,10 @@ a:hover {
   color: #FFFFFF;
 }
 
+table, .table, .table-striped, .table-bordered, .table th, .table td {
+  color: #FFFFFF !important;
+}
+
 button, .btn-primary, .btn-danger {
   background-color: #C9082A !important; 
   color: #FFFFFF !important;
