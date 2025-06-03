@@ -3,22 +3,22 @@
 body {
   padding: 50px;
   font: 14px 'Outfit', 'Lucida Grande', Helvetica, Arial, sans-serif;
-  background-color: #013369;
-  color: #ffffff; 
+  background-color: #17408B; 
+  color: #FFFFFF; 
 }
 
 a {
-  color: #D50A0A; 
+  color: #C9082A; 
   text-decoration: underline;
 }
 
 a:hover {
-  color: #ffffff;
+  color: #FFFFFF;
 }
 
 button, .btn-primary, .btn-danger {
-  background-color: #D50A0A !important;
-  color: #fff !important;
+  background-color: #C9082A !important; 
+  color: #FFFFFF !important;
   border: none;
   font-family: 'Outfit', 'Lucida Grande', Helvetica, Arial, sans-serif;
   font-weight: 700;
@@ -29,29 +29,29 @@ button, .btn-primary, .btn-danger {
 }
 
 button:hover, .btn-primary:hover, .btn-danger:hover {
-  background-color: #a00808 !important;
-  color: #fff !important;
+  background-color: #a1061f !important; 
+  color: #FFFFFF !important;
 }
 
 nav.navbar {
-  background-color: #013369 !important;
+  background-color: #17408B !important; 
 }
 
 .navbar .navbar-brand {
-  color: #fff !important;
+  color: #FFFFFF !important;
 }
 
 .navbar .navbar-brand:hover {
-  color: #D50A0A !important;
+  color: #C9082A !important; 
 }
 
 #identity_div a.btn-primary {
-  background-color: #D50A0A !important;
-  color: #fff !important;
+  background-color: #C9082A !important;
+  color: #FFFFFF !important;
   border: none;
 }
 
 #identity_div a.btn-primary:hover {
-  background-color: #a00808 !important;
-  color: #fff !important;
+  background-color: #a1061f !important;
+  color: #FFFFFF !important;
 }
