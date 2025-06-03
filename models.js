@@ -23,7 +23,6 @@ const teamSchema = new mongoose.Schema({
     }
 });
 
-
 models.Post = mongoose.model('Team', teamSchema)
 
 console.log("finished creating models")

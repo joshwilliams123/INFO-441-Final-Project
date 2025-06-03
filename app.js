@@ -4,8 +4,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 
-import usersRouter from './api/users.js';
-import teamRoutes from './api/team.js';
+import apiRouter from './routes/api.js';
 
 import models from './models.js';
 
@@ -25,7 +24,7 @@ const authConfig = {
         clientId: "9c6b9dfa-e30d-4cc7-a7fe-168dfc3903ec",
         authority: "https://login.microsoftonline.com/f6b6dd5b-f02f-441a-99a0-162ac5060bd2",
         clientSecret: "~da8Q~oPPNDK22dQaijoJkCDPiRw-F6mlPR7-b_Y",
-        redirectUri: "https://info-441-final-project.onrender.com/redirect",
+        redirectUri: "/redirect",
     },
     system: {
         loggerOptions: {
@@ -75,7 +74,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/api/users', usersRouter);
-app.use('/api/team', teamRoutes);
+app.use('/api', apiRouter);
 
 export default app;
