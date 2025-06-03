@@ -32,6 +32,10 @@ const teamSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    league: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'League'
+    },
     created_date: {
         type: Date,
         default: Date.now

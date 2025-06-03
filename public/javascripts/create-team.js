@@ -5,10 +5,12 @@ function initCreateTeam() {
         const membersSelect = document.getElementById('members');
         const members = Array.from(membersSelect.selectedOptions).map(opt => opt.value);
 
+        const leagueId = localStorage.getItem('selectedLeagueId');
+
         const res = await fetch('/api/team/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ teamName, members })
+            body: JSON.stringify({ teamName, members, leagueId })
         });
         const msgDiv = document.getElementById('create-team-message');
         if (res.ok) {

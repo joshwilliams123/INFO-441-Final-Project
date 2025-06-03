@@ -13,6 +13,7 @@ router.post("/create", async (req, res, next) => {
         const newTeamData = new req.models.Post({
           teamName,
           members,
+          league: leagueId,
           created_date: Date.now(),
         });
         await newTeamData.save();
