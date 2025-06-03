@@ -1,8 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px 'Outfit', 'Lucida Grande', Helvetica, Arial, sans-serif;
+  background-color: #013369;
+  color: #ffffff; 
 }
 
 a {
-  color: #00B7FF;
+  color: #D50A0A; 
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+button, .btn-primary, .btn-danger {
+  background-color: #D50A0A !important;
+  color: #fff !important;
+  border: none;
+  font-family: 'Outfit', 'Lucida Grande', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin: 4px 2px;
+  transition: background 0.2s;
+}
+
+button:hover, .btn-primary:hover, .btn-danger:hover {
+  background-color: #a00808 !important;
+  color: #fff !important;
+}
+
+nav.navbar {
+  background-color: #013369 !important;
+}
+
+.navbar .navbar-brand {
+  color: #fff !important;
+}
+
+.navbar .navbar-brand:hover {
+  color: #D50A0A !important;
+}
+
+#identity_div a.btn-primary {
+  background-color: #D50A0A !important;
+  color: #fff !important;
+  border: none;
+}
+
+#identity_div a.btn-primary:hover {
+  background-color: #a00808 !important;
+  color: #fff !important;
 }
