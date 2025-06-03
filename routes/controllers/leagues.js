@@ -11,18 +11,28 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Create a new league
 router.post('/', async (req, res) => {
-    const { leagueName } = req.body;
-    if (!leagueName) {
-        return res.status(400).json({ error: 'League name is required' });
-    }
-
-    try {
-        const newLeague = new req.models.League({ leagueName });
-        await newLeague.save();
-        res.status(201).json(newLeague);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to create league' });
+    if (req.session.isAuthenticated) {
+        const { leagueName } = req.body;
+        try {
+            const existingLeague = await req.models.League.findOne({ leagueName });
+            if (!existingLeague) {
+                const newLeague = new req.models.League({
+                    leagueName,
+                    teams: [],
+                });
+                await newLeague.save();
+                res.json({ status: 'success', message: 'League created', league: newLeague });
+            } else {
+                res.json({ status: 'error', message: 'League already exists' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ status: 'error', message: error.message });
+        }
+    } else {
+        res.status(401).json({ status: 'error', message: 'not logged in' });
     }
 });
 

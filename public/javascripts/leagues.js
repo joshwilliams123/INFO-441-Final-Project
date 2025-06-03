@@ -7,7 +7,7 @@ async function loadLeagues() {
     leaguesUl.innerHTML = 'Loading...';
     try {
         const leagues = await fetchJSON('/leagues');
-        leaguesUl.innerHTML = leagues.map(league => `<li>${escapeHTML(league.leagueName)}</li>`).join('');
+        leaguesUl.innerHTML = leagues.map(league => `<li>league.leagueName</li>`).join('');
     } catch (err) {
         leaguesUl.innerHTML = 'Failed to load leagues';
     }
@@ -25,14 +25,18 @@ async function createLeague() {
 
     createLeagueStatus.innerText = 'Creating league...';
     try {
-        await fetchJSON('/leagues', {
+        const response = await fetch('/api/leagues', {
             method: 'POST',
-            body: { leagueName }
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ leagueName })
         });
         createLeagueStatus.innerText = 'League created!';
         leagueNameInput.value = '';
         loadLeagues();
     } catch (err) {
+        console.log(err);
         createLeagueStatus.innerText = 'Failed to create league';
     }
 }
