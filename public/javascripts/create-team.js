@@ -6,6 +6,7 @@ function initCreateTeam() {
         const members = Array.from(membersSelect.selectedOptions).map(opt => opt.value);
 
         const leagueId = localStorage.getItem('selectedLeagueId');
+        console.log('leagueId:', leagueId);
 
         const res = await fetch('/api/team/create', {
             method: 'POST',

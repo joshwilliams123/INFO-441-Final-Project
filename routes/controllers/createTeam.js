@@ -6,7 +6,7 @@ var router = express.Router();
 
 router.post("/create", async (req, res, next) => {
   if (req.session.isAuthenticated) {
-    const { teamName, members } = req.body;
+    const { teamName, members, leagueId } = req.body;
     try {
       const teamData = await req.models.Post.exists({ teamName });
       if (!teamData) {
