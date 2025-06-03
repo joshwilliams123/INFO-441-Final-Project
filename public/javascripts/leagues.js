@@ -30,6 +30,7 @@ function selectLeague(leagueId, leagueName) {
     localStorage.setItem('selectedLeagueId', leagueId);
     localStorage.setItem('selectedLeagueName', leagueName);
     alert(`Selected league: ${leagueName}. Now go create your team!`);
+    window.location.href = '/create-team.html';
 }
 
 async function createLeague() {
