@@ -1,5 +1,10 @@
 async function init() {
   await loadIdentity();
+
+  if (window.location.pathname === "/leagues.html") {
+    await initLeagues();
+  }
+
   document.getElementById("create-team-btn").onclick = function () {
     window.location.href = "create-team.html";
   };
@@ -8,5 +13,9 @@ async function init() {
   };
   document.getElementById("drop-player-btn").onclick = function () {
     window.location.href = "drop-player.html";
+  };
+
+  document.getElementById("league-btn").onclick = function () {
+    window.location.href = "leagues.html";
   };
 }

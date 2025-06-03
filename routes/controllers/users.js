@@ -8,7 +8,8 @@ router.get('/myIdentity', (req, res) => {
             userInfo: {
                 name: req.session.account.name,
                 username: req.session.account.username
-            }
+            },
+            shouldRedirect: req.query.redirect === 'true'
         });
     } else {
         return res.json({ status: "loggedout" });

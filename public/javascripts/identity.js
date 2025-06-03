@@ -10,13 +10,19 @@ async function loadIdentity(){
     let identity_div = document.getElementById("identity_div");
 
     try{
-        let identityInfo = await fetchJSON(`api/users/myIdentity`)
+        let identityInfo = await fetchJSON(`api/users/myIdentity?redirect=true`)
         
         if(identityInfo.status == "loggedin"){
             myIdentity = identityInfo.userInfo.username;
             identity_div.innerHTML = `
             <a href="/userInfo.html?user=${encodeURIComponent(identityInfo.userInfo.username)}">${identityInfo.userInfo.name} (${identityInfo.userInfo.username})</a>
             <a href="signout" class="btn btn-danger" role="button">Log out</a>`;
+            
+            // Redirect to leagues page if on the index page
+            if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                window.location.href = '/leagues.html';
+            }
+            
             if(document.getElementById("make_post_div")){
                 document.getElementById("make_post_div").classList.remove("d-none");
             }
@@ -24,6 +30,10 @@ async function loadIdentity(){
             Array.from(document.getElementsByClassName("heart-button-span")).forEach(e => e.classList.remove("d-none"));
         } else { //logged out
             myIdentity = undefined;
+            // If not on index page, redirect to home
+            if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+                window.location.href = '/';
+            }
             identity_div.innerHTML = `
             <a href="signin" class="btn btn-primary" role="button">Log in</a>`;
             if(document.getElementById("make_post_div")){
