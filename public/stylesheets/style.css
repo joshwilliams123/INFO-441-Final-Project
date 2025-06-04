@@ -102,6 +102,16 @@ nav.navbar {
   border-bottom: none;
 }
 
+.player-dropdown-item.disabled {
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.player-dropdown-item.disabled:hover {
+  background-color: #f8f9fa;
+}
+
 .selected-players {
   margin-top: 10px;
 }

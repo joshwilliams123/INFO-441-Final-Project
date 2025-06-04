@@ -68,26 +68,33 @@ async function loadPlayerList() {
   }
 }
 
-function setupSearchableDropdown() {
+async function setupSearchableDropdown() {
   const searchInput = document.getElementById("player-search");
   const dropdown = document.getElementById("player-dropdown");
 
-  searchInput.addEventListener("input", function (e) {
-    const query = e.target.value.trim().toLowerCase();
+  try {
+    // Get all existing teams to check player availability
+    const res = await fetch("/api/team/all-teams");
+    const data = await res.json();
+    const allTeamPlayers = data.teams.flatMap(team => team.members);
 
-    if (query.length === 0) {
-      hideDropdown();
-      return;
-    }
+    searchInput.addEventListener("input", function (e) {
+      const query = e.target.value.trim().toLowerCase();
 
-    const filteredPlayers = allPlayers.filter(
-      (player) =>
-        player.toLowerCase().includes(query) &&
-        !selectedPlayers.includes(player)
-    );
+      if (query.length === 0) {
+        hideDropdown();
+        return;
+      }
 
-    showDropdown(filteredPlayers);
-  });
+      const filteredPlayers = allPlayers.filter(
+        (player) => player.toLowerCase().includes(query)
+      );
+
+      showDropdownWithAvailability(filteredPlayers, allTeamPlayers);
+    });
+  } catch (error) {
+    console.error("Error loading teams:", error);
+  }
 
   searchInput.addEventListener("focus", function (e) {
     const query = e.target.value.trim().toLowerCase();
@@ -112,18 +119,49 @@ function setupSearchableDropdown() {
 function showDropdown(players) {
   const dropdown = document.getElementById("player-dropdown");
 
+  if (selectedPlayers.length >= 10) {
+    dropdown.innerHTML = '<div class="no-results">Team is full (10 players maximum)</div>';
+  } else if (players.length === 0) {
+    dropdown.innerHTML = '<div class="no-results">No players found</div>';
+  } else {
+    dropdown.innerHTML = players
+      .slice(0, 10)
+      .map((player) => {
+        const isOnTeam = selectedPlayers.includes(player);
+        const className = isOnTeam ? "player-dropdown-item disabled" : "player-dropdown-item";
+        const style = isOnTeam ? "opacity: 0.6;" : "";
+        const suffix = isOnTeam ? " (Already selected)" : "";
+        return `<div class="${className}" style="${style}" ${!isOnTeam ? `onclick="selectPlayer('${player.replace(/'/g, "\\'")}')"` : ""}>${player}${suffix}</div>`;
+      })
+      .join("");
+  }
+
+  dropdown.style.display = "block";
+}
+
+function showDropdownWithAvailability(players, allTeamPlayers) {
+  const dropdown = document.getElementById("player-dropdown");
+
   if (players.length === 0) {
     dropdown.innerHTML = '<div class="no-results">No players found</div>';
   } else {
     dropdown.innerHTML = players
       .slice(0, 10)
-      .map(
-        (player) =>
-          `<div class="player-dropdown-item" onclick="selectPlayer('${player.replace(
-            /'/g,
-            "\\'"
-          )}')">${player}</div>`
-      )
+      .map((player) => {
+        const isOnAnyTeam = allTeamPlayers.includes(player);
+        const isSelected = selectedPlayers.includes(player);
+        const className = "player-dropdown-item" + ((isOnAnyTeam || isSelected) ? " disabled" : "");
+        const style = (isOnAnyTeam || isSelected) ? "opacity: 0.6;" : "";
+        let suffix = "";
+        if (isSelected) suffix = " (Already selected)";
+        else if (isOnAnyTeam) suffix = " (On another team)";
+        
+        return `<div class="${className}" style="${style}" ${
+          !isOnAnyTeam && !isSelected ? 
+          `onclick="selectPlayer('${player.replace(/'/g, "\\'")}')"` : 
+          ""
+        }>${player}${suffix}</div>`;
+      })
       .join("");
   }
 
@@ -135,11 +173,15 @@ function hideDropdown() {
 }
 
 function selectPlayer(playerName) {
-  if (!selectedPlayers.includes(playerName)) {
+  if (!selectedPlayers.includes(playerName) && selectedPlayers.length < 10) {
     selectedPlayers.push(playerName);
     updateSelectedPlayersDisplay();
     document.getElementById("player-search").value = "";
     hideDropdown();
+  } else if (selectedPlayers.length >= 10) {
+    const msgDiv = document.getElementById("create-team-message");
+    msgDiv.innerHTML = '<div class="alert alert-warning">Maximum 10 players allowed per team.</div>';
+    setTimeout(() => msgDiv.innerHTML = '', 3000);
   }
 }
 
@@ -157,18 +199,22 @@ function updateSelectedPlayersDisplay() {
       '<small class="form-text text-light">Selected players will appear here. You need at least one player to create a team.</small>';
     membersInput.value = "";
   } else {
-    container.innerHTML = selectedPlayers
-      .map(
-        (player) =>
-          `<span class="selected-player-tag">
-                    ${player}
-                    <span class="remove-player" onclick="removePlayer('${player.replace(
-                      /'/g,
-                      "\\'"
-                    )}')">&times;</span>
-                </span>`
-      )
-      .join("");
+    container.innerHTML = `
+      <div class="selected-players-header">
+        <span>Selected Players (${selectedPlayers.length}/10)</span>
+      </div>
+      ${selectedPlayers
+        .map(
+          (player) =>
+            `<span class="selected-player-tag">
+              ${player}
+              <span class="remove-player" onclick="removePlayer('${player.replace(
+                /'/g,
+                "\\'"
+              )}')">&times;</span>
+            </span>`
+        )
+        .join("")}`;
     membersInput.value = JSON.stringify(selectedPlayers);
   }
 }

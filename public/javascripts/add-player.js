@@ -24,6 +24,12 @@ async function initAddPlayer() {
       return;
     }
 
+    if (currentTeamPlayers.length >= 10) {
+      document.getElementById("add-player-message").innerHTML =
+        '<div class="alert alert-danger">Team already has maximum number of players (10).</div>';
+      return;
+    }
+
     if (currentTeamPlayers.includes(player)) {
       document.getElementById("add-player-message").innerHTML =
         '<div class="alert alert-warning">This player is already on the team.</div>';
@@ -81,7 +87,7 @@ async function loadTeamPlayers() {
       teamInfo.innerHTML = `
         <div class="team-header">
           <strong>Team: ${data.team.teamName}</strong> 
-          <span class="badge bg-secondary">${currentTeamPlayers.length} players</span>
+          <span class="badge bg-secondary">${currentTeamPlayers.length}/10 players</span>
         </div>`;
 
       if (currentTeamPlayers.length === 0) {
