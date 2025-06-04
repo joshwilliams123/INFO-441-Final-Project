@@ -69,13 +69,12 @@ async function loadPlayerList() {
 
 async function loadTeamPlayers() {
   const teamSection = document.getElementById("current-team-section");
-  const teamInfo = document.getElementById("team-info");
+  const teamName = document.getElementById("team-name");
   const playersDiv = document.getElementById("current-players");
   const messageDiv = document.getElementById("add-player-message");
 
-  teamInfo.innerHTML = '<div class="loading">Loading team players...</div>';
-  teamSection.style.display = "block";
   messageDiv.innerHTML = '';
+  teamSection.style.display = "block";
 
   try {
     const res = await fetch("/api/addPlayer");
@@ -84,18 +83,20 @@ async function loadTeamPlayers() {
     if (res.ok && data.status === "success") {
       currentTeam = data.team;
       currentTeamPlayers = data.team.members || [];
-      teamInfo.innerHTML = `
-        <div class="team-header">
-          <strong>Team: ${data.team.teamName}</strong> 
-          <span class="badge bg-secondary">${currentTeamPlayers.length}/10 players</span>
-        </div>`;
+      teamName.textContent = data.team.teamName;
 
       if (currentTeamPlayers.length === 0) {
-        playersDiv.innerHTML =
-          '<div class="text-light">No players on this team yet.</div>';
+        playersDiv.innerHTML = '<div class="list-group-item text-muted">No players on this team yet.</div>';
       } else {
         playersDiv.innerHTML = currentTeamPlayers
-          .map((player) => `<span class="player-tag">${player}</span>`)
+          .map((player) => `
+            <div class="list-group-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <span>${player}</span>
+                <span class="badge bg-secondary">Active</span>
+              </div>
+            </div>
+          `)
           .join("");
       }
     } else {
