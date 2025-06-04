@@ -24,4 +24,24 @@ router.delete("/", async (req, res) => {
   }
 });
 
+router.get("/team", async (req, res) => {
+  if (!req.session.isAuthenticated) {
+    return res.status(401).json({ status: "error", message: "not logged in" });
+  }
+
+  try {
+    const team = await req.models.Post.findOne({
+      username: req.session.account.username,
+    });
+    if (team) {
+      res.status(200).json({ status: "success", team });
+    } else {
+      res.status(404).json({ status: "error", message: "team not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 export default router;
