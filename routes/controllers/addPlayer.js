@@ -27,13 +27,17 @@ router.post("/", async (req, res) => {
 //Get the players from the team based on the current user logged in
 router.get("/", async (req, res) => {
   if (req.session.isAuthenticated) {
-    const { teamName } = req.query;
     try {
-      const team = await req.models.Post.findOne({ teamName });
+      const team = await req.models.Post.findOne({
+        username: req.session.account.username,
+      });
       if (team) {
         res.status(200).json({ status: "success", team });
       } else {
-        res.json({ status: "error", message: "team does not exist" });
+        res.status(404).json({
+          status: "error",
+          message: "No team found for this user",
+        });
       }
     } catch (error) {
       console.error(error);
