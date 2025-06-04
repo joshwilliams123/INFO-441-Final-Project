@@ -5,12 +5,9 @@ import { parse } from 'csv-parse/sync';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const csvPath = path.join(process.cwd(), 'data', 'players.csv');
-  const csvData = fs.readFileSync(csvPath, 'utf8');
-  const records = parse(csvData, { columns: true, skip_empty_lines: true });
-
-  const leaderboard = records.map(player => {
+function buildPlayerPointsMap(records) {
+  const map = {};
+  for (const player of records) {
     const pts = Number(player.PTS) || 0;
     const fg3m = Number(player['3P']) || 0;
     const fga = Number(player.FGA) || 0;
@@ -36,16 +33,40 @@ router.get('/', (req, res) => {
       blk * 4 +
       tov * -2;
 
-    return {
-      Player: player.Player,
-      Team: player.Team,
-      PTS: player.PTS,
-      FantasyPoints: fantasyPoints
-    };
-  });
+    map[player.Player.trim()] = fantasyPoints;
+  }
+  return map;
+}
 
-  leaderboard.sort((a, b) => b.FantasyPoints - a.FantasyPoints);
-  res.json(leaderboard.slice(0, 20));
+router.get('/:leagueId', async (req, res) => {
+  try {
+    const leagueId = req.params.leagueId;
+    const models = req.models || (await import('../../models.js')).default;
+    const teams = await models.Post.find({ league: leagueId }).lean();
+
+    const csvPath = path.join(process.cwd(), 'data', 'players.csv');
+    const csvData = fs.readFileSync(csvPath, 'utf8');
+    const records = parse(csvData, { columns: true, skip_empty_lines: true });
+    const playerPoints = buildPlayerPointsMap(records);
+
+    const standings = teams.map(team => {
+      const totalPoints = (team.members || []).reduce(
+        (sum, member) => sum + (playerPoints[member.trim()] || 0),
+        0
+      );
+      return {
+        teamName: team.teamName,
+        members: team.members,
+        totalPoints
+      };
+    });
+
+    standings.sort((a, b) => b.totalPoints - a.totalPoints);
+    res.json(standings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to build standings' });
+  }
 });
 
 export default router;
