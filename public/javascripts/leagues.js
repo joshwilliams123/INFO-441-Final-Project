@@ -1,6 +1,6 @@
-async function fetchJSON(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Network response was not ok');
+async function fetchJSON(url, options) {
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
 }
 
@@ -12,8 +12,6 @@ async function initLeagues() {
     // Always load all leagues and set up team viewing if on leagues page
     if (window.location.pathname === '/leagues.html') {
          await loadLeagues();
-         // Initially hide team actions
-        document.getElementById('team_actions').style.display = 'none';
     }
 }
 
@@ -56,9 +54,14 @@ async function loadLeagues() {
         leaguesUl.innerHTML = leagues.map(league => `
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>${league.leagueName}</span>
-                <button class="btn btn-primary btn-sm" onclick="selectLeague('${league._id}', '${league.leagueName}')">
-                    Join
-                </button>
+                <div>
+                    <button class="btn btn-primary me-2" onclick="viewLeagueTeams('${league._id}', '${league.leagueName}')">
+                        View Teams
+                    </button>
+                    <button class="btn btn-success" onclick="selectLeague('${league._id}', '${league.leagueName}')">
+                        Join
+                    </button>
+                </div>
             </li>
         `).join('');
     } catch (err) {
@@ -69,12 +72,11 @@ async function loadLeagues() {
 async function viewLeagueTeams(leagueId, leagueName) {
     const teamsUl = document.getElementById('teams_ul');
     const selectedLeagueInfo = document.getElementById('selected_league_info');
-    const teamActionsDiv = document.getElementById('team_actions');
+    const teamsPlaceholder = document.getElementById('teams_placeholder');
     
     selectedLeagueInfo.innerHTML = `<h4>Teams in ${leagueName}</h4>`;
     teamsUl.innerHTML = 'Loading...';
-    // Show team actions buttons
-    if(teamActionsDiv) teamActionsDiv.style.display = 'block';
+    if(teamsPlaceholder) teamsPlaceholder.style.display = 'none'; // Hide placeholder when loading teams
 
     try {
         const response = await fetchJSON(`/api/leagues/${leagueId}/teams`);
@@ -84,15 +86,22 @@ async function viewLeagueTeams(leagueId, leagueName) {
                     <li class="list-group-item">
                         <h5 class="mb-1">${team.teamName}</h5>
                         <p class="mb-1">Members: ${team.members.join(', ')}</p>
+                        ${window.location.pathname === '/homepage.html' && team.username === myIdentity ? 
+                            `<button class="btn btn-primary btn-sm me-2" onclick="window.location.href='/add-player.html'">Add Player</button>
+                             <button class="btn btn-danger btn-sm" onclick="window.location.href='/drop-player.html'">Drop Player</button>` 
+                            : ''}
                     </li>
                 `).join('');
             } else {
                 teamsUl.innerHTML = '<li class="list-group-item">No teams in this league yet.</li>';
             }
+        } else {
+             teamsUl.innerHTML = '<li class="list-group-item text-danger">Failed to load teams</li>';
+             if(teamsPlaceholder) teamsPlaceholder.style.display = 'block'; // Show placeholder on error
         }
     } catch (err) {
         teamsUl.innerHTML = '<li class="list-group-item text-danger">Failed to load teams</li>';
-         if(teamActionsDiv) teamActionsDiv.style.display = 'none'; // Hide actions on error
+        if(teamsPlaceholder) teamsPlaceholder.style.display = 'block'; // Show placeholder on error
     }
 }
 

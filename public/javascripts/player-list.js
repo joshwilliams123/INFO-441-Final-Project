@@ -27,7 +27,7 @@ async function initCreateTeam() {
     const msgDiv = document.getElementById("create-team-message");
     if (res.ok) {
       const data = await res.json();
-      if (data.team) {
+      if (data.status === 'success') {
         msgDiv.innerHTML = `
                         <div class="alert alert-success">
                             <h4>Team Created Successfully!</h4>
@@ -39,9 +39,15 @@ async function initCreateTeam() {
                             </ul>
                         </div>
                     `;
+        // Redirect to homepage after a short delay
+        setTimeout(() => {
+            window.location.href = '/homepage.html';
+        }, 2000); // Redirect after 2 seconds
+
       } else {
-        msgDiv.innerHTML =
-          '<div class="alert alert-success">Team created successfully!</div>';
+         msgDiv.innerHTML = `<div class="alert alert-danger">${
+        data.message || "Failed to create team."
+      }</div>`;
       }
     } else {
       const err = await res.json();
