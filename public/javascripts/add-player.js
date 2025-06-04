@@ -105,26 +105,34 @@ async function loadTeamPlayers() {
   }
 }
 
-function setupSearchableDropdown() {
+async function setupSearchableDropdown() {
   const searchInput = document.getElementById("player-search");
   const dropdown = document.getElementById("player-dropdown");
 
-  searchInput.addEventListener("input", function (e) {
-    const query = e.target.value.trim().toLowerCase();
+  try {
+    const res = await fetch("/api/team/all-teams");
+    const data = await res.json();
+    const allTeamPlayers = data.teams.flatMap(team => team.members);
 
-    if (query.length === 0) {
-      hideDropdown();
-      selectedPlayer = "";
-      document.getElementById("player").value = "";
-      return;
-    }
+    searchInput.addEventListener("input", function (e) {
+      const query = e.target.value.trim().toLowerCase();
 
-    const filteredPlayers = allPlayers.filter((player) =>
-      player.toLowerCase().includes(query)
-    );
+      if (query.length === 0) {
+        hideDropdown();
+        selectedPlayer = "";
+        document.getElementById("player").value = "";
+        return;
+      }
 
-    showDropdown(filteredPlayers);
-  });
+      const filteredPlayers = allPlayers.filter((player) =>
+        player.toLowerCase().includes(query)
+      );
+
+      showDropdownWithAvailability(filteredPlayers, allTeamPlayers);
+    });
+  } catch (error) {
+    console.error("Error loading teams:", error);
+  }
 
   searchInput.addEventListener("focus", function (e) {
     const query = e.target.value.trim().toLowerCase();
@@ -169,6 +177,31 @@ function showDropdown(players) {
   dropdown.style.display = "block";
 }
 
+function showDropdownWithAvailability(players, allTeamPlayers) {
+  const dropdown = document.getElementById("player-dropdown");
+
+  if (players.length === 0) {
+    dropdown.innerHTML = '<div class="no-results">No players found</div>';
+  } else {
+    dropdown.innerHTML = players
+      .slice(0, 10)
+      .map((player) => {
+        const isOnAnyTeam = allTeamPlayers.includes(player);
+        const isOnCurrentTeam = currentTeamPlayers.includes(player);
+        const className = "player-dropdown-item" + (isOnAnyTeam ? " disabled" : "");
+        const style = isOnAnyTeam ? "opacity: 0.6;" : "";
+        let suffix = "";
+        if (isOnCurrentTeam) suffix = " (Already on team)";
+        else if (isOnAnyTeam) suffix = " (On another team)";
+        
+        return `<div class="${className}" style="${style}" ${!isOnAnyTeam ? `onclick="selectPlayer('${player.replace(/'/g, "\\'")}')"` : ""}>${player}${suffix}</div>`;
+      })
+      .join("");
+  }
+
+  dropdown.style.display = "block";
+}
+
 function hideDropdown() {
   document.getElementById("player-dropdown").style.display = "none";
 }
@@ -179,6 +212,5 @@ function selectPlayer(playerName) {
   document.getElementById("player").value = playerName;
   hideDropdown();
 
-  // Clear any previous messages
   document.getElementById("add-player-message").innerHTML = "";
 }

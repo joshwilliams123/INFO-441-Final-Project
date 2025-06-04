@@ -1,10 +1,22 @@
 import express from "express";
 var router = express.Router();
 
+async function isPlayerInAnyTeam(req, playerName) {
+  const allTeams = await req.models.Post.find({});
+  return allTeams.some((team) => team.members.includes(playerName));
+}
+
 router.post("/", async (req, res) => {
   if (req.session.isAuthenticated) {
     const { teamName, player } = req.body;
     try {
+      if (await isPlayerInAnyTeam(req, player)) {
+        return res.json({
+          status: "error",
+          message: "This player is already on another team",
+        });
+      }
+
       const team = await req.models.Post.findOne({ teamName });
       if (team) {
         team.members.push(player);
