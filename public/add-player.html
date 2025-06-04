@@ -8,7 +8,7 @@
 </head>
 <body onload="initAddPlayer()">
   <nav class="navbar navbar-light bg-light">
-    <a href="index.html" class="navbar-brand">Back</a>
+    <a href="homepage.html" class="navbar-brand">Back</a>
   </nav>
   <div class="container mt-4">
     <h2>Add Player to Team</h2>
@@ -16,13 +16,26 @@
       <div class="mb-3">
         <label for="teamName" class="form-label">Team Name</label>
         <input type="text" class="form-control" id="teamName" required>
+        <button type="button" class="btn btn-secondary mt-2" onclick="loadTeamPlayers()">Load Team Players</button>
       </div>
       <div class="mb-3">
-        <label for="player" class="form-label">Player Name</label>
-        <input type="text" class="form-control" id="player" required>
+        <label for="player-search" class="form-label">Search Player to Add</label>
+        <div class="player-search-container">
+          <input type="text" class="form-control" id="player-search" placeholder="Search for a player to add...">
+          <div id="player-dropdown" class="player-dropdown"></div>
+        </div>
+        <input type="hidden" id="player" name="player" required>
+        <small class="form-text text-light">Search and click on a player to select them.</small>
       </div>
       <button type="submit" class="btn btn-primary">Add Player</button>
-    </form>
+    </form>                    
+    
+    <div id="current-team-section" class="current-team-players" style="display: none;">
+      <h4>Current Team Players</h4>
+      <div id="team-info" class="team-info"></div>
+      <div id="current-players" class="player-list"></div>
+    </div>
+    
     <div id="add-player-message" class="mt-3"></div>
   </div>
 </body>
