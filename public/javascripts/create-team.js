@@ -1,35 +1,36 @@
 function initCreateTeam() {
-    document.getElementById('create-team-form').onsubmit = async function (e) {
+    const form = document.getElementById('create-team-form');
+    
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const teamName = document.getElementById('teamName').value.trim();
-        const membersSelect = document.getElementById('members');
-        const members = Array.from(membersSelect.selectedOptions).map(opt => opt.value);
-
-        const leagueId = localStorage.getItem('selectedLeagueId');
-        console.log('leagueId:', leagueId);
-
-        const res = await fetch('/api/team/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ teamName, members, leagueId })
-        });
-        const msgDiv = document.getElementById('create-team-message');
-        if (res.ok) {
-            const data = await res.json();
-            if (data.team) {
-                msgDiv.innerHTML = `
-                    <h4>Team</h4>
-                    <div><strong>${data.team.teamName}</strong></div>
-                    <ul>
-                        ${data.team.members.map(member => `<li>${member}</li>`).join('')}
-                    </ul>
-                `;
+        
+        const teamName = document.getElementById('teamName').value;
+        const memberSelect = document.getElementById('members');
+        const members = Array.from(memberSelect.selectedOptions).map(opt => opt.value);
+        
+        try {
+            const response = await fetch('/create-team/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ teamName, members })
+            });
+            
+            const data = await response.json();
+            const messageDiv = document.getElementById('create-team-message');
+            
+            if (data.status === 'success') {
+                messageDiv.className = 'alert alert-success';
+                messageDiv.textContent = 'Team created successfully!';
+                form.reset();
+                document.getElementById('selected-players').innerHTML = '';
             } else {
-                msgDiv.innerHTML = '<div class="alert alert-success">Team created successfully!</div>';
+                messageDiv.className = 'alert alert-danger';
+                messageDiv.textContent = data.message;
             }
-        } else {
-            const err = await res.json();
-            msgDiv.innerHTML = `<div class="alert alert-danger">${err.message || 'Failed to create team.'}</div>`;
+        } catch (error) {
+            console.error('Error:', error);
         }
-    };
+    });
 }

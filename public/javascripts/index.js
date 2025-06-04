@@ -1,9 +1,6 @@
 async function init() {
   await loadIdentity();
 
-  if (window.location.pathname === "/leagues.html") {
-    await initLeagues();
-  }
 
   document.getElementById("create-team-btn").onclick = function () {
     window.location.href = "create-team.html";
