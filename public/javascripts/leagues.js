@@ -5,12 +5,22 @@ async function fetchJSON(url) {
 }
 
 async function initLeagues() {
-    await loadLeagues();
-    await loadUserLeagues();
+    // Check if on homepage to load user leagues
+    if (window.location.pathname === '/homepage.html') {
+        await loadUserLeagues();
+    }
+    // Always load all leagues and set up team viewing if on leagues page
+    if (window.location.pathname === '/leagues.html') {
+         await loadLeagues();
+         // Initially hide team actions
+        document.getElementById('team_actions').style.display = 'none';
+    }
 }
 
 async function loadUserLeagues() {
     const userLeaguesUl = document.getElementById('user_leagues_ul');
+    if (!userLeaguesUl) return; // Exit if element doesn't exist on this page
+
     userLeaguesUl.innerHTML = 'Loading...';
     try {
         const teams = await fetchJSON('/api/team/my-teams');
@@ -32,13 +42,14 @@ async function loadUserLeagues() {
             userLeaguesUl.innerHTML = '<li class="list-group-item">You have not joined any leagues yet.</li>';
         }
     } catch (err) {
-        console.error(err);
         userLeaguesUl.innerHTML = '<li class="list-group-item text-danger">Failed to load your leagues</li>';
     }
 }
 
 async function loadLeagues() {
     const leaguesUl = document.getElementById('leagues_ul');
+     if (!leaguesUl) return; // Exit if element doesn't exist on this page
+
     leaguesUl.innerHTML = 'Loading...';
     try {
         const leagues = await fetchJSON('/api/leagues');
@@ -58,10 +69,13 @@ async function loadLeagues() {
 async function viewLeagueTeams(leagueId, leagueName) {
     const teamsUl = document.getElementById('teams_ul');
     const selectedLeagueInfo = document.getElementById('selected_league_info');
+    const teamActionsDiv = document.getElementById('team_actions');
     
     selectedLeagueInfo.innerHTML = `<h4>Teams in ${leagueName}</h4>`;
     teamsUl.innerHTML = 'Loading...';
-    
+    // Show team actions buttons
+    if(teamActionsDiv) teamActionsDiv.style.display = 'block';
+
     try {
         const response = await fetchJSON(`/api/leagues/${leagueId}/teams`);
         if (response.status === 'success') {
@@ -78,6 +92,7 @@ async function viewLeagueTeams(leagueId, leagueName) {
         }
     } catch (err) {
         teamsUl.innerHTML = '<li class="list-group-item text-danger">Failed to load teams</li>';
+         if(teamActionsDiv) teamActionsDiv.style.display = 'none'; // Hide actions on error
     }
 }
 

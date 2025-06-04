@@ -8,22 +8,53 @@
   <script src="javascripts/identity.js"></script>
   <script src="javascripts/create-team.js"></script>
   <script src="javascripts/index.js"></script>
+  <script src="javascripts/leagues.js"></script>
 
 </head>
 
-<body onload="init()">
+<body onload="init(); initLeagues();">
   <nav class="navbar">
     <div id="errorInfo" class="alert alert-danger fade show" role="alert" style="opacity:0"></div>
     <div id="identity_div">loading...</div>
   </nav>
-  <h1 style="font-size: 50px">Build your team!</h1>
-  <h4>Explore our page to make a team and edit your roster.</h4>
-  <button id="create-team-btn" class="btn btn-primary">Create Team</button>
-  <button id="add-player-btn" class="btn btn-primary">Add Player</button>
-  <button id="drop-player-btn" class="btn btn-danger">Drop Player</button>
-  <button id="league-btn" class="btn btn-danger">Join a League</button>
-  <a href="leaderboard.html" class="btn btn-primary" id="leaderboard-btn" style="margin-left: 8px;">View Leaderboard</a>
-  <a href="team-viewer.html" class="btn btn-primary" id="leaderboard-btn" style="margin-left: 8px;">View Teams</a>
+  <div class="container mt-4">
+    <h1 class="homepage-text" style="font-size: 50px">Build your team!</h1>
+    <h4 class="homepage-text">Explore our page to make a team and edit your roster.</h4>
+    
+    <div class="row mb-4">
+      <div class="col">
+        <button id="create-team-btn" class="btn btn-primary">Create Team</button>
+        <button id="league-btn" class="btn btn-primary">Join a League</button>
+        <a href="leaderboard.html" class="btn btn-primary" id="leaderboard-btn" style="margin-left: 8px;">View Leaderboard</a>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2>Your Leagues</h2>
+            </div>
+            <div class="card-body">
+              <ul id="user_leagues_ul" class="list-group list-group-flush"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2>Teams in Selected League</h2>
+            </div>
+            <div class="card-body">
+              <div id="selected_league_info" class="mb-3"></div>
+              <ul id="teams_ul" class="list-group list-group-flush"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
 </body>
 
 </html>

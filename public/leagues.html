@@ -15,7 +15,7 @@
   <body onload="init(); initLeagues();">
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
-        <div><a href="/homepage.html">Return to Homepage</a></div>
+        <div><a href="/homepage.html" class="btn btn-danger">Return to Homepage</a></div>
         <div id="errorInfo" class="alert alert-danger fade show" role="alert" style="opacity:0"></div>
         <div id="identity_div">loading...</div>
       </div>
@@ -24,37 +24,12 @@
     <div class="container mt-4">
       <h1>Leagues</h1>
       
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-header">
-              <h2>Your Leagues</h2>
-            </div>
-            <div class="card-body">
-              <ul id="user_leagues_ul" class="list-group list-group-flush"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-header">
-              <h2>All Leagues</h2>
-            </div>
-            <div class="card-body">
-              <ul id="leagues_ul" class="list-group list-group-flush"></ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="card mb-4">
         <div class="card-header">
-          <h2>Teams in Selected League</h2>
+          <h2>All Leagues</h2>
         </div>
         <div class="card-body">
-          <div id="selected_league_info" class="mb-3"></div>
-          <ul id="teams_ul" class="list-group list-group-flush"></ul>
+          <ul id="leagues_ul" class="list-group list-group-flush"></ul>
         </div>
       </div>
 
