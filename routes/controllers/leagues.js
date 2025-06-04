@@ -11,6 +11,30 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get a specific league by ID
+router.get('/:leagueId', async (req, res) => {
+    try {
+        const league = await req.models.League.findById(req.params.leagueId);
+        if (league) {
+            res.json(league);
+        } else {
+            res.status(404).json({ error: 'League not found' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch league' });
+    }
+});
+
+// Get teams in a specific league
+router.get('/:leagueId/teams', async (req, res) => {
+    try {
+        const teams = await req.models.Post.find({ league: req.params.leagueId }).lean();
+        res.json({ status: 'success', teams });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch teams' });
+    }
+});
+
 // Create a new league
 router.post('/', async (req, res) => {
     if (req.session.isAuthenticated) {

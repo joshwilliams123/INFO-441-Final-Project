@@ -15,7 +15,7 @@ async function loadIdentity(){
         if(identityInfo.status == "loggedin"){
             myIdentity = identityInfo.userInfo.username;
             identity_div.innerHTML = `
-            <a href="/userInfo.html?user=${encodeURIComponent(identityInfo.userInfo.username)}">${identityInfo.userInfo.name} (${identityInfo.userInfo.username})</a>
+            ${identityInfo.userInfo.name} (${identityInfo.userInfo.username})
             <a href="signout" class="btn btn-danger" role="button">Log out</a>`;
             
             // Redirect to leagues page if on the index page

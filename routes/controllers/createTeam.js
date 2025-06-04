@@ -4,29 +4,45 @@ import path from "path";
 import { parse } from "csv-parse";
 var router = express.Router();
 
+async function isPlayerInAnyTeam(req, playerName) {
+  const allTeams = await req.models.Post.find({});
+  return allTeams.some((team) => team.members.includes(playerName));
+}
+
 router.post("/create", async (req, res, next) => {
   if (req.session.isAuthenticated) {
     const username = req.session.account.username;
     const { teamName, members, leagueId } = req.body;
     try {
       const teamData = await req.models.Post.exists({ teamName });
-      if (!teamData) {
-        const newTeamData = new req.models.Post({
-          username,
-          teamName,
-          members,
-          league: leagueId,
-          created_date: Date.now(),
-        });
-        await newTeamData.save();
-        res.json({
-          status: "success",
-          message: "team created",
-          team: newTeamData,
-        });
-      } else {
-        res.json({ status: "error", message: "team already exists" });
+      if (teamData) {
+        return res.json({ status: "error", message: "team already exists" });
       }
+
+      // Check if any player is already in another team
+      for (const player of members) {
+        if (await isPlayerInAnyTeam(req, player)) {
+          return res.json({
+            status: "error",
+            message: `Player ${player} is already on another team`,
+          });
+        }
+      }
+
+      // Create new team
+      const newTeamData = new req.models.Post({
+        username,
+        teamName,
+        members,
+        league: leagueId,
+        created_date: Date.now(),
+      });
+      await newTeamData.save();
+      res.json({
+        status: "success",
+        message: "team created",
+        team: newTeamData,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ status: "error", message: error.message });
@@ -62,6 +78,19 @@ router.get('/my-teams', async (req, res) => {
   const username = req.session.account.username;
   try {
     const teams = await req.models.Post.find({ username }).lean();
+    res.json({ status: "success", teams });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
+router.get('/all-teams', async (req, res) => {
+  if (!req.session.isAuthenticated) {
+    return res.status(401).json({ status: "error", message: "not logged in" });
+  }
+  try {
+    const teams = await req.models.Post.find({}, 'teamName members').lean();
     res.json({ status: "success", teams });
   } catch (error) {
     console.error(error);

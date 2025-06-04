@@ -1,10 +1,22 @@
 import express from "express";
 var router = express.Router();
 
+async function isPlayerInAnyTeam(req, playerName) {
+  const allTeams = await req.models.Post.find({});
+  return allTeams.some((team) => team.members.includes(playerName));
+}
+
 router.post("/", async (req, res) => {
   if (req.session.isAuthenticated) {
     const { teamName, player } = req.body;
     try {
+      if (await isPlayerInAnyTeam(req, player)) {
+        return res.json({
+          status: "error",
+          message: "This player is already on another team",
+        });
+      }
+
       const team = await req.models.Post.findOne({ teamName });
       if (team) {
         team.members.push(player);
@@ -27,13 +39,17 @@ router.post("/", async (req, res) => {
 //Get the players from the team based on the current user logged in
 router.get("/", async (req, res) => {
   if (req.session.isAuthenticated) {
-    const { teamName } = req.query;
     try {
-      const team = await req.models.Post.findOne({ teamName });
+      const team = await req.models.Post.findOne({
+        username: req.session.account.username,
+      });
       if (team) {
         res.status(200).json({ status: "success", team });
       } else {
-        res.json({ status: "error", message: "team does not exist" });
+        res.status(404).json({
+          status: "error",
+          message: "No team found for this user",
+        });
       }
     } catch (error) {
       console.error(error);
