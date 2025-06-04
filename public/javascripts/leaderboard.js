@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td>${topPlayer || ''}</td>
                     <td>${team.totalPoints}</td>
                     <td>
-  <button class="btn btn-primary btn-sm" onclick="viewTeam('${encodeURIComponent(team.teamName)}','${encodeURIComponent(team.username)}')">View Team</button>
-</td>
+                        <button class="btn btn-primary btn-sm" onclick="viewTeam('${encodeURIComponent(team.teamName)}','${encodeURIComponent(team.username)}')">View Team</button>
+                    </td>
                 </tr>`;
             }).join('');
         } catch (err) {
