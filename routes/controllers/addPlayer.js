@@ -1,8 +1,8 @@
 import express from "express";
 var router = express.Router();
 
-async function isPlayerInAnyTeam(req, playerName) {
-  const allTeams = await req.models.Post.find({});
+async function isPlayerInAnyTeamInLeague(req, playerName, leagueId) {
+  const allTeams = await req.models.Post.find({ league: leagueId });
   return allTeams.some((team) => team.members.includes(playerName));
 }
 
@@ -23,10 +23,10 @@ router.post("/", async (req, res) => {
         });
       }
 
-      if (await isPlayerInAnyTeam(req, player)) {
+      if (await isPlayerInAnyTeamInLeague(req, player, team.league)) {
         return res.json({
           status: "error",
-          message: "This player is already on another team",
+          message: "This player is already on another team in this league",
         });
       }
 

@@ -9,6 +9,11 @@ async function isPlayerInAnyTeam(req, playerName) {
   return allTeams.some((team) => team.members.includes(playerName));
 }
 
+async function isPlayerInAnyTeamInLeague(req, playerName, leagueId) {
+  const allTeams = await req.models.Post.find({ league: leagueId });
+  return allTeams.some((team) => team.members.includes(playerName));
+}
+
 router.post("/create", async (req, res, next) => {
   if (req.session.isAuthenticated) {
     const username = req.session.account.username;
@@ -19,12 +24,12 @@ router.post("/create", async (req, res, next) => {
         return res.json({ status: "error", message: "team already exists" });
       }
 
-      // Check if any player is already in another team
+      // Check if any player is already in another team in the same league
       for (const player of members) {
-        if (await isPlayerInAnyTeam(req, player)) {
+        if (await isPlayerInAnyTeamInLeague(req, player, leagueId)) {
           return res.json({
             status: "error",
-            message: `Player ${player} is already on another team`,
+            message: `Player ${player} is already on another team in this league`,
           });
         }
       }
@@ -90,7 +95,8 @@ router.get('/all-teams', async (req, res) => {
     return res.status(401).json({ status: "error", message: "not logged in" });
   }
   try {
-    const teams = await req.models.Post.find({}, 'teamName members').lean();
+    // Add leagueId to the response
+    const teams = await req.models.Post.find({}, 'teamName members league').lean();
     res.json({ status: "success", teams });
   } catch (error) {
     console.error(error);

@@ -71,12 +71,13 @@ async function loadPlayerList() {
 async function setupSearchableDropdown() {
   const searchInput = document.getElementById("player-search");
   const dropdown = document.getElementById("player-dropdown");
+  const leagueId = localStorage.getItem("selectedLeagueId");
 
   try {
-    // Get all existing teams to check player availability
     const res = await fetch("/api/team/all-teams");
     const data = await res.json();
-    const allTeamPlayers = data.teams.flatMap(team => team.members);
+    const teamsInLeague = data.teams.filter(team => team.league === leagueId);
+    const playersInLeague = teamsInLeague.flatMap(team => team.members);
 
     searchInput.addEventListener("input", function (e) {
       const query = e.target.value.trim().toLowerCase();
@@ -90,7 +91,7 @@ async function setupSearchableDropdown() {
         (player) => player.toLowerCase().includes(query)
       );
 
-      showDropdownWithAvailability(filteredPlayers, allTeamPlayers);
+      showDropdownWithAvailability(filteredPlayers, playersInLeague);
     });
   } catch (error) {
     console.error("Error loading teams:", error);
@@ -139,7 +140,7 @@ function showDropdown(players) {
   dropdown.style.display = "block";
 }
 
-function showDropdownWithAvailability(players, allTeamPlayers) {
+function showDropdownWithAvailability(players, playersInLeague) {
   const dropdown = document.getElementById("player-dropdown");
 
   if (players.length === 0) {
@@ -148,16 +149,16 @@ function showDropdownWithAvailability(players, allTeamPlayers) {
     dropdown.innerHTML = players
       .slice(0, 10)
       .map((player) => {
-        const isOnAnyTeam = allTeamPlayers.includes(player);
+        const isInLeague = playersInLeague.includes(player);
         const isSelected = selectedPlayers.includes(player);
-        const className = "player-dropdown-item" + ((isOnAnyTeam || isSelected) ? " disabled" : "");
-        const style = (isOnAnyTeam || isSelected) ? "opacity: 0.6;" : "";
+        const className = "player-dropdown-item" + ((isInLeague || isSelected) ? " disabled" : "");
+        const style = (isInLeague || isSelected) ? "opacity: 0.6;" : "";
         let suffix = "";
         if (isSelected) suffix = " (Already selected)";
-        else if (isOnAnyTeam) suffix = " (On another team)";
+        else if (isInLeague) suffix = " (Already in this league)";
         
         return `<div class="${className}" style="${style}" ${
-          !isOnAnyTeam && !isSelected ? 
+          !isInLeague && !isSelected ? 
           `onclick="selectPlayer('${player.replace(/'/g, "\\'")}')"` : 
           ""
         }>${player}${suffix}</div>`;
