@@ -66,7 +66,7 @@ app.use('/api', apiRouter);
 
 app.get('/signin', (req, res, next) => {
     return req.authContext.login({
-        postLoginRedirectUri: "/leagues.html", 
+        postLoginRedirectUri: "/homepage.html", 
     })(req, res, next);
 
 });

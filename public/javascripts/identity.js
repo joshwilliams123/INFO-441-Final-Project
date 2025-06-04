@@ -18,9 +18,9 @@ async function loadIdentity(){
             ${identityInfo.userInfo.name} (${identityInfo.userInfo.username})
             <a href="signout" class="btn btn-danger" role="button">Log out</a>`;
             
-            // Redirect to leagues page if on the index page
+            // Redirect to homepage page if on the index page
             if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                window.location.href = '/leagues.html';
+                window.location.href = '/homepage.html';
             }
             
             if(document.getElementById("make_post_div")){
