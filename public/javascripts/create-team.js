@@ -8,13 +8,16 @@ function initCreateTeam() {
         const memberSelect = document.getElementById('members');
         const members = Array.from(memberSelect.selectedOptions).map(opt => opt.value);
         
+        const leagueId = localStorage.getItem('selectedLeagueId');
+        const username = localStorage.getItem('username');
+
         try {
             const response = await fetch('/create-team/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ teamName, members })
+                body: JSON.stringify({ username, teamName, members, leagueId })
             });
             
             const data = await response.json();

@@ -19,8 +19,7 @@ router.post('/', async (req, res) => {
             const existingLeague = await req.models.League.findOne({ leagueName });
             if (!existingLeague) {
                 const newLeague = new req.models.League({
-                    leagueName,
-                    teams: [],
+                    leagueName
                 });
                 await newLeague.save();
                 res.json({ status: 'success', message: 'League created', league: newLeague });

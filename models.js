@@ -12,10 +12,6 @@ const leagueSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    teams: {
-        type: [String],
-        default: []
-    },
     created_date: {
         type: Date,
         default: Date.now
@@ -23,6 +19,7 @@ const leagueSchema = new mongoose.Schema({
 });
 
 const teamSchema = new mongoose.Schema({
+    username: String,
     teamName: {
         type: String,
         required: true,

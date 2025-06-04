@@ -6,11 +6,13 @@ var router = express.Router();
 
 router.post("/create", async (req, res, next) => {
   if (req.session.isAuthenticated) {
+    const username = req.session.account.username;
     const { teamName, members, leagueId } = req.body;
     try {
       const teamData = await req.models.Post.exists({ teamName });
       if (!teamData) {
         const newTeamData = new req.models.Post({
+          username,
           teamName,
           members,
           league: leagueId,
@@ -51,6 +53,20 @@ router.get("/player-names", async (req, res) => {
       console.error(err);
       res.status(500).json({ error: "Failed to read player names" });
     });
+});
+
+router.get('/my-teams', async (req, res) => {
+  if (!req.session.isAuthenticated) {
+    return res.status(401).json({ status: "error", message: "not logged in" });
+  }
+  const username = req.session.account.username;
+  try {
+    const teams = await req.models.Post.find({ username }).lean();
+    res.json({ status: "success", teams });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: error.message });
+  }
 });
 
 export default router;
