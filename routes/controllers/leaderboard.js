@@ -50,13 +50,19 @@ router.get('/:leagueId', async (req, res) => {
     const playerPoints = buildPlayerPointsMap(records);
 
     const standings = teams.map(team => {
-      const totalPoints = (team.members || []).reduce(
-        (sum, member) => sum + (playerPoints[member.trim()] || 0),
-        0
-      );
+      const memberPoints = {};
+      let totalPoints = 0;
+      (team.members || []).forEach(member => {
+        const pts = playerPoints[member.trim()] || 0;
+        memberPoints[member.trim()] = pts;
+        totalPoints += pts;
+      });
       return {
+        _id: team._id,
         teamName: team.teamName,
+        username: team.username,
         members: team.members,
+        memberPoints,
         totalPoints
       };
     });

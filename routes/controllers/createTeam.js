@@ -69,4 +69,21 @@ router.get('/my-teams', async (req, res) => {
   }
 });
 
+router.get('/team-by-name', async (req, res) => {
+  const { teamName, username } = req.query;
+  if (!teamName || !username) {
+    return res.status(400).json({ status: "error", message: "Missing teamName or username" });
+  }
+  try {
+    const team = await req.models.Post.findOne({ teamName, username }).lean();
+    if (!team) {
+      return res.status(404).json({ status: "error", message: "Team not found" });
+    }
+    res.json({ status: "success", team });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 export default router;
