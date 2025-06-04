@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Leagues</title>
@@ -9,7 +10,6 @@
     <script src="javascripts/leagues.js"></script>
     <script src="javascripts/index.js"></script>
     <script src="javascripts/identity.js"></script>
-
   </head>
 
   <body onload="init(); initLeagues();">
@@ -21,17 +21,54 @@
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container mt-4">
       <h1>Leagues</h1>
-      <div id="leagues_list">
-        <h2>Current Leagues</h2>
-        <ul id="leagues_ul"></ul>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2>Your Leagues</h2>
+            </div>
+            <div class="card-body">
+              <ul id="user_leagues_ul" class="list-group list-group-flush"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2>All Leagues</h2>
+            </div>
+            <div class="card-body">
+              <ul id="leagues_ul" class="list-group list-group-flush"></ul>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="create_league">
-        <h2>Create a New League</h2>
-        <input type="text" id="leagueNameInput" placeholder="Enter league name" />
-        <button onclick="createLeague()">Create League</button>
-        <span id="createLeagueStatus"></span>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2>Teams in Selected League</h2>
+        </div>
+        <div class="card-body">
+          <div id="selected_league_info" class="mb-3"></div>
+          <ul id="teams_ul" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Create a New League</h2>
+        </div>
+        <div class="card-body">
+          <div class="input-group mb-3">
+            <input type="text" id="leagueNameInput" class="form-control" placeholder="Enter league name" />
+            <button class="btn btn-primary" onclick="createLeague()">Create League</button>
+          </div>
+          <span id="createLeagueStatus" class="text-muted"></span>
+        </div>
       </div>
     </div>
   </body>
