@@ -2,8 +2,11 @@ let allPlayers = [];
 let currentTeamPlayers = [];
 let selectedPlayer = "";
 let currentTeam = null;
+let userTeams = [];
+let userTeamsMap = {};
 
 async function initAddPlayer() {
+  await loadUserTeamsDropdown();
   await loadPlayerList();
   await loadTeamPlayers();
   setupSearchableDropdown();
@@ -48,13 +51,63 @@ async function initAddPlayer() {
       selectedPlayer = "";
       document.getElementById("player-search").value = "";
       document.getElementById("player").value = "";
-      await loadTeamPlayers();
+      await loadTeamPlayers(true); // force reload from backend after add
     } else {
       msgDiv.innerHTML = `<div class="alert alert-danger">${
         data.message || "Failed to add player."
       }</div>`;
     }
   };
+}
+
+async function loadUserTeamsDropdown() {
+  try {
+    const res = await fetch("/api/team/my-teams");
+    const data = await res.json();
+    if (data.status === "success" && data.teams.length > 0) {
+      userTeams = data.teams;
+      userTeamsMap = {};
+      const dropdown = document.getElementById("team-switch-dropdown");
+      dropdown.innerHTML = '<option value="">Select your team...</option>';
+      for (const team of userTeams) {
+        // Fetch league name for each team
+        let leagueName = "";
+        if (team.league && typeof team.league === "object" && team.league.leagueName) {
+          leagueName = team.league.leagueName;
+        } else if (team.league) {
+          // Fetch league name if not populated
+          try {
+            const leagueRes = await fetch(`/api/leagues/${team.league}`);
+            const leagueData = await leagueRes.json();
+            leagueName = leagueData.leagueName || "";
+          } catch {}
+        }
+        const optionText = `${team.teamName} (${leagueName})`;
+        dropdown.innerHTML += `<option value="${team.teamName}">${optionText}</option>`;
+        userTeamsMap[team.teamName] = team;
+      }
+      // Set default selected team if not set
+      if (!currentTeam && userTeams.length > 0) {
+        dropdown.value = userTeams[0].teamName;
+        currentTeam = userTeams[0];
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+async function onTeamSwitchChange() {
+  const dropdown = document.getElementById("team-switch-dropdown");
+  const selectedTeamName = dropdown.value;
+  if (selectedTeamName && userTeamsMap[selectedTeamName]) {
+    currentTeam = userTeamsMap[selectedTeamName];
+    await loadTeamPlayers(true); // force reload from backend
+    document.getElementById("add-player-message").innerHTML = "";
+    document.getElementById("player-search").value = "";
+    document.getElementById("player").value = "";
+    selectedPlayer = "";
+  }
 }
 
 async function loadPlayerList() {
@@ -67,7 +120,7 @@ async function loadPlayerList() {
   }
 }
 
-async function loadTeamPlayers() {
+async function loadTeamPlayers(forceReload = false) {
   const teamSection = document.getElementById("current-team-section");
   const teamName = document.getElementById("team-name");
   const playersDiv = document.getElementById("current-players");
@@ -77,13 +130,32 @@ async function loadTeamPlayers() {
   teamSection.style.display = "block";
 
   try {
-    const res = await fetch("/api/addPlayer");
-    const data = await res.json();
+    let teamData = null;
+    if (currentTeam && currentTeam.teamName && !forceReload) {
+      // Use selected team from dropdown if available and not forcing reload
+      teamData = currentTeam;
+    } else if (currentTeam && currentTeam.teamName && forceReload) {
+      // Always fetch latest from backend if forced
+      const res = await fetch(`/api/addPlayer?teamName=${encodeURIComponent(currentTeam.teamName)}`);
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        teamData = data.team;
+        // Update currentTeam in map as well
+        userTeamsMap[currentTeam.teamName] = teamData;
+      }
+    } else {
+      // fallback to API
+      const res = await fetch("/api/addPlayer");
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        teamData = data.team;
+      }
+    }
 
-    if (res.ok && data.status === "success") {
-      currentTeam = data.team;
-      currentTeamPlayers = data.team.members || [];
-      teamName.textContent = data.team.teamName;
+    if (teamData) {
+      currentTeam = teamData;
+      currentTeamPlayers = teamData.members || [];
+      teamName.textContent = teamData.teamName;
 
       if (currentTeamPlayers.length === 0) {
         playersDiv.innerHTML = '<div class="list-group-item text-muted">No players on this team yet.</div>';
@@ -101,7 +173,7 @@ async function loadTeamPlayers() {
       }
     } else {
       teamSection.style.display = "none";
-      messageDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+      messageDiv.innerHTML = `<div class="alert alert-danger">No team found for your account.</div>`;
       currentTeamPlayers = [];
     }
   } catch (error) {
@@ -221,3 +293,6 @@ function selectPlayer(playerName) {
 
   document.getElementById("add-player-message").innerHTML = "";
 }
+
+// Expose onTeamSwitchChange to global scope
+window.onTeamSwitchChange = onTeamSwitchChange;

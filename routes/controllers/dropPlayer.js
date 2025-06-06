@@ -30,9 +30,16 @@ router.get("/team", async (req, res) => {
   }
 
   try {
-    const team = await req.models.Post.findOne({
-      username: req.session.account.username,
-    });
+    // Support ?teamName=... for switching teams
+    const teamName = req.query.teamName;
+    let team;
+    if (teamName) {
+      team = await req.models.Post.findOne({ teamName });
+    } else {
+      team = await req.models.Post.findOne({
+        username: req.session.account.username,
+      });
+    }
     if (team) {
       res.status(200).json({ status: "success", team });
     } else {

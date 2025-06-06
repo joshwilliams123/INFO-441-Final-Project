@@ -12,6 +12,14 @@
   </nav>
   <div class="container mt-4">
     <h2>Add Player to Team</h2>
+
+    <!-- Team Switch Dropdown -->
+    <div class="mb-3">
+      <label for="team-switch-dropdown" class="form-label">Switch Team</label>
+      <select id="team-switch-dropdown" class="form-select" onchange="onTeamSwitchChange()">
+        <option value="">Select your team...</option>
+      </select>
+    </div>
     
     <div id="current-team-section" class="current-team-players mb-4">
       <div id="team-info" class="team-info">
